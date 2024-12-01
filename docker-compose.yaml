@@ -1,0 +1,262 @@
+services:
+    admin:
+      container_name: "admin"
+      build: ./services/admin
+      env_file:
+        - .env
+      environment:
+        DJANGO_SUPERUSER_PASSWORD: ${ADMIN_DJANGO_SUPERUSER_PASSWORD}
+      depends_on:
+        admin_db:
+          condition: service_healthy
+      volumes:
+        - ./services/admin/static:/app/static
+      healthcheck:
+        test: ["CMD-SHELL", "[ -e /app/static ]"]
+        interval: 5s
+        timeout: 10s
+        retries: 15 
+
+    admin_db:
+      container_name: "admin_db"
+      build: ./services/admin_db
+      environment:
+          POSTGRES_DB: ${ADMIN_DJANGO_DB_NAME}
+          POSTGRES_USER: ${ADMIN_DJANGO_DB_USER}
+          POSTGRES_PASSWORD: ${ADMIN_DJANGO_DB_PASSWORD}
+          POSTGRES_HOST: ${ADMIN_DJANGO_DB_HOST}
+          POSTGRES_PORT: ${ADMIN_DJANGO_DB_PORT}
+      env_file:
+        - .env
+      volumes:
+        - ./services/admin_db/data:/var/lib/postgresql/data
+      healthcheck:
+          test: ["CMD-SHELL", "pg_isready -d admin_database -U postgres"] 
+          interval: 2s
+          timeout: 10s
+          retries: 30
+
+    auth:
+      container_name: "auth"
+      build: ./services/auth
+      volumes:
+        - ./services/auth:/app:ro
+        - ./services/auth/logs:/app/logs
+      env_file:
+        - .env
+      depends_on:
+        auth_db:
+          condition: service_healthy
+        redis:
+          condition: service_healthy
+      healthcheck:
+        test: ["CMD-SHELL", "curl -f http://localhost:8001/health || exit 1"]
+        interval: 10s
+        timeout: 5s
+        retries: 3
+
+    auth_db:
+      container_name: "auth_db"
+      build: ./services/auth_db
+      environment:
+          POSTGRES_DB: ${AUTH_POSTGRES_DB_NAME}
+          POSTGRES_USER: ${AUTH_POSTGRES_USER}
+          POSTGRES_PASSWORD: ${AUTH_POSTGRES_PASSWORD}
+          POSTGRES_HOST: ${AUTH_POSTGRES_HOST}
+          POSTGRES_PORT: ${AUTH_POSTGRES_PORT}
+
+      volumes:
+        - ./services/auth_db/data:/var/lib/postgresql/data
+        - ./services/auth_db/docker-entrypoint-initdb:/docker-entrypoint-initdb.d/:ro
+      healthcheck:
+          test: ["CMD-SHELL", "pg_isready -d auth_db -U admin"] 
+          interval: 2s
+          retries: 100
+
+    content:
+      container_name: "content"
+      build: ./services/content
+      volumes:
+        - ./services/content:/app:ro
+        - ./services/content/logs:/app/logs
+      env_file:
+        - .env
+      depends_on:
+        - elasticsearch
+        - redis
+      healthcheck:
+        test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+        interval: 10s
+        timeout: 5s
+        retries: 3
+
+    elasticsearch:
+      container_name: "elasticsearch"
+      image: elasticsearch:8.12.1
+      volumes:
+        - ./services/es/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+        - ./services/es/data:/usr/share/elasticsearch/data
+      healthcheck:
+        test: ["CMD-SHELL", "curl -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+        retries: 90
+        interval: 3s
+
+    etl_content:
+      container_name: "etl_content"
+      ports: 
+        - ${ETL_ELASTIC_PORTS}
+      build: ./services/etl_content
+      volumes:
+        - ./services/etl_content:/app:ro
+        - ./services/etl_content/logs:/app/logs
+      env_file:
+        - .env
+      depends_on: 
+        elasticsearch:
+          condition: service_healthy
+
+    jaeger:
+      image: jaegertracing/all-in-one:latest
+      container_name: jaeger
+      ports:
+        - ${JAEGER_PORTS}
+      depends_on:
+        nginx:
+          condition: service_started
+
+    redis:
+      build: ./services/redis
+      container_name: "redis"
+      volumes: 
+        - ./services/redis/data:/data
+      restart: always
+      healthcheck:
+        test: ["CMD", "redis-cli", "ping"]
+        timeout: 10s
+        retries: 5
+        start_period: 10s
+      ports:
+        - ${REDIS_PORTS}
+
+    nginx:
+      container_name: "nginx"
+      restart: always
+      build: ./services/nginx
+      volumes:
+        - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        - ./services/nginx/configs:/etc/nginx/conf.d:ro
+        - ./services/admin/static:/static/:ro
+      ports:
+        - ${NGINX_PORTS}
+
+    ugc:
+      build: './services/ugc'
+      container_name: ugc
+      environment:
+        UGC_JWT_SECRET_KEY: ${AUTH_JWT_SECRET_KEY}
+        UGC_JWT_ALGORITHM: ${AUTH_JWT_ALGORITHM}
+      volumes:
+        - ./services/ugc:/app:ro
+        - ./services/ugc/logs:/app/logs
+      env_file:
+        - .env
+      depends_on:
+        - kafka-0
+        - kafka-1
+        - kafka-2
+      healthcheck:
+        test: ["CMD-SHELL", "curl -f http://localhost:8003/health || exit 1"]
+        interval: 10s
+        timeout: 5s
+        retries: 3
+
+    kafka-0:
+      build: ./services/kafka
+      container_name: kafka-0
+      environment:
+          KAFKA_CFG_NODE_ID: ${KAFKA_0_CFG_NODE_ID}
+          KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: ${KAFKA_0_CFG_CONTROLLER_QUORUM_VOTERS}
+          KAFKA_CFG_LISTENERS: ${KAFKA_0_CFG_LISTENERS}
+          KAFKA_CFG_ADVERTISED_LISTENERS: ${KAFKA_0_CFG_ADVERTISED_LISTENERS}
+      env_file:
+        - .env
+      volumes:
+        - kafka-0_data:/bitnami/kafka
+      healthcheck:
+        test: kafka-cluster.sh cluster-id --bootstrap-server localhost:9092 || exit 1
+        interval: 1s
+        timeout: 60s
+        retries: 60
+
+    kafka-1:
+      build: ./services/kafka
+      container_name: kafka-1
+      environment:
+          KAFKA_CFG_NODE_ID: ${KAFKA_1_CFG_NODE_ID}
+          KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: ${KAFKA_1_CFG_CONTROLLER_QUORUM_VOTERS}
+          KAFKA_CFG_LISTENERS: ${KAFKA_1_CFG_LISTENERS}
+          KAFKA_CFG_ADVERTISED_LISTENERS: ${KAFKA_1_CFG_ADVERTISED_LISTENERS}
+      env_file:
+        - .env
+      volumes:
+        - kafka-1_data:/bitnami/kafka
+      healthcheck:
+        test: kafka-cluster.sh cluster-id --bootstrap-server localhost:9092 || exit 1
+        interval: 1s
+        timeout: 60s
+        retries: 60
+    
+    kafka-2:
+      build: ./services/kafka
+      container_name: kafka-2
+      environment:
+          KAFKA_CFG_NODE_ID: ${KAFKA_2_CFG_NODE_ID}
+          KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: ${KAFKA_2_CFG_CONTROLLER_QUORUM_VOTERS}
+          KAFKA_CFG_LISTENERS: ${KAFKA_2_CFG_LISTENERS}
+          KAFKA_CFG_ADVERTISED_LISTENERS: ${KAFKA_2_CFG_ADVERTISED_LISTENERS}
+      env_file:
+        - .env
+      volumes:
+        - kafka-2_data:/bitnami/kafka
+      healthcheck:
+        test: kafka-cluster.sh cluster-id --bootstrap-server localhost:9092 || exit 1
+        interval: 1s
+        timeout: 60s
+        retries: 60
+
+    kafka-ui:
+      image: provectuslabs/kafka-ui:v0.7.2
+      container_name: kafka-ui
+      env_file:
+        - .env
+      ports:
+        - ${KAFKA_UI_PORTS}
+
+    etl_ugc:
+      build: ./services/etl_ugc
+      container_name: etl_ugc
+      volumes:
+        - ./services/etl_ugc:/app:ro
+        - ./services/etl_ugc/logs:/app/logs
+      env_file:
+        - .env
+      depends_on:
+        clickhouse:
+          condition: service_healthy
+        kafka-0:
+          condition: service_healthy
+      restart: always
+
+    clickhouse:
+      build: ./services/clickhouse
+      container_name: clickhouse
+      volumes:
+        - ./services/clickhouse/data:/var/lib/clickhouse
+        - ./services/clickhouse/logs:/var/log/clickhouse-server
+      healthcheck:
+        test: wget --no-verbose --tries=3 --spider http://localhost:8123/ping || exit 1
+
+volumes:
+  kafka-0_data:
+  kafka-1_data:
+  kafka-2_data:
