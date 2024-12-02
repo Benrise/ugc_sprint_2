@@ -1,3 +1,4 @@
+from typing import List, Optional
 import orjson
 
 from functools import lru_cache
@@ -69,11 +70,11 @@ class FilmService:
 
     async def get_films(
             self, genre: str, sort_field: str, sort_order: Sort, page: int, size: int
-    ) -> list[FilmRating]:
+    ) -> List[FilmRating]:
         cache_key = 'film:rating:all'
         if genre:
             cache_key = f'film:rating:genre:{genre}'
-        films = await self._films_from_cache(cache_key)
+        films: Optional[List[FilmRating]] = await self._films_from_cache(cache_key)
         if not films:
             films = await self._get_films_from_search_service(
                 genre, sort_field,
@@ -82,7 +83,7 @@ class FilmService:
                 size
             )
             if not films:
-                return None
+                films = []
             await self._put_films_to_cache(films, cache_key)
         return films
 

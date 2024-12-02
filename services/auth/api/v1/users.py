@@ -52,17 +52,18 @@ async def get_users(
     authorize: AuthJWT = Depends(auth_dep)
 ) -> List[UserInDBRole]:
     await authorize.jwt_required()
-
-    return await user_service.get_all_users(db)
+    users: List[UserInDBRole] = await user_service.get_all_users(db)
+    return users
 
 
 @router.post('/signup', response_model=UserInDB, status_code=HTTPStatus.CREATED)
 async def create_user(
     user_create: UserCreate,
-    user_service: UserService = Depends(get_user_service), 
+    user_service: UserService = Depends(get_user_service),
     db: AsyncSession = Depends(get_session),
-):
-    return await user_service.create_user(user_create, db)
+) -> UserInDB:
+    user: UserInDB = await user_service.create_user(user_create, db)
+    return user
 
 
 @router.get('/signin/{provider}')

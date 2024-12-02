@@ -31,28 +31,31 @@ class MongoDBAdapter(AsyncNoSQLDatabaseService):
     async def find_many(self, collection: str, query: Dict[str, Any]) -> List[Dict[str, Any]]:
         try:
             cursor = self.database[collection].find(query)
-            result = await cursor.to_list(length=None)
+            result: List[Dict[str, Any]] = await cursor.to_list(length=None)
             return result
         except Exception:
-            return []
+            result = []
+            return result
 
     async def insert_one(self, collection: str, document: Dict[str, Any]) -> str:
         try:
-            result = await self.database[collection].insert_one(document)
-            return str(result.inserted_id)
+            response = await self.database[collection].insert_one(document)
+            return str(response.inserted_id)
         except Exception:
-            return ""
+            return "Error on insert"
 
     async def update_one(self, collection: str, query: Dict[str, Any], update: Dict[str, Any]) -> bool:
         try:
-            result = await self.database[collection].update_one(query, {"$set": update})
-            return result.modified_count > 0
+            response = await self.database[collection].update_one(query, {"$set": update})
+            result: bool = response.modified_count > 0
+            return result
         except Exception:
             return False
 
     async def delete_one(self, collection: str, query: Dict[str, Any]) -> bool:
         try:
-            result = await self.database[collection].delete_one(query)
-            return result.deleted_count > 0
+            response = await self.database[collection].delete_one(query)
+            result: bool = response.deleted_count > 0
+            return result
         except Exception:
             return False

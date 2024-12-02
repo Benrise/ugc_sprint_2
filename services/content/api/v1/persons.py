@@ -41,13 +41,13 @@ async def persons_list(
         ),
         pagination: PaginatedParams = Depends(),
         person_service: PersonService = Depends(get_person_service)) -> List[PersonFilms]:
-    persons = await person_service.get_persons(
+    persons: List[PersonFilms] = await person_service.get_persons(
         query,
         pagination.page,
         pagination.size,
     )
     if not persons:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='persons not found')
+        persons = []
     return persons
 
 
