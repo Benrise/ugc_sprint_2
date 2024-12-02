@@ -24,7 +24,7 @@ class MongoDBAdapter(AsyncNoSQLDatabaseService):
     async def find_one(self, collection: str, query: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         try:
             result = await self.database[collection].find_one(query)
-            return result
+            return result if result is not None else None
         except Exception:
             return None
 

@@ -66,10 +66,11 @@ class PersonService:
         return persons
 
     async def _persons_from_cache(self, cache_key: str) -> list[PersonFilms] | None:
-        persons: list[PersonFilms] = await self.cache.get(cache_key)
+        persons = await self.cache.get(cache_key)
         if not persons:
             return None
-        return orjson.loads(persons)
+        persons_list: list[PersonFilms] = [PersonFilms.model_validate_json(person) for person in orjson.loads(persons)]
+        return persons_list
 
     async def _put_persons_to_cache(self, persons: list[PersonFilms], cache_key: str):
         await self.cache.set(

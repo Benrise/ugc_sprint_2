@@ -1,3 +1,4 @@
+from typing import List
 from http import HTTPStatus
 from uuid import UUID
 from fastapi import HTTPException, Request
@@ -10,6 +11,7 @@ from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash
 from async_fastapi_jwt_auth import AuthJWT
 
+from core.config import jwt_settings
 from models.entity import User, UserHistory
 from schemas.user import (
     ChangePassword,
@@ -25,7 +27,7 @@ class UserService:
     def __init__(self, cache: Redis) -> None:
         self.cache = cache
 
-    async def _add_to_db(self, obj, db: AsyncSession) -> object | None:
+    async def _add_to_db(self, obj: User | UserHistory, db: AsyncSession) -> object | None:
         try:
             db.add(obj)
             await db.commit()
@@ -67,7 +69,7 @@ class UserService:
         history_entry = UserHistory(**jsonable_encoder(login_history))
         return await self._add_to_db(history_entry, db)
 
-    async def get_login_history(self, user: User, page: int, size: int, db: AsyncSession):
+    async def get_login_history(self, user: User, page: int, size: int, db: AsyncSession) -> List[UserHistory]:
         offset = (page - 1) * size
         query = await db.execute(
             select(UserHistory)
@@ -78,11 +80,22 @@ class UserService:
         )
         return query.scalars().all()
 
-    async def get_all_users(self, db: AsyncSession) -> list[UserInDB]:
+    async def get_all_users(self, db: AsyncSession) -> List[UserInDB]:
         query = await db.execute(select(User))
         return query.scalars().all()
 
-    async def complete_oauth2_authentication(self, user: User, _: Request, authorize: AuthJWT, db: AsyncSession) -> tuple[str, str, User]:
-        tokens = await self.create_user_tokens(user.login, authorize)
+    async def complete_oauth2_authentication(self, user: User, _: Request, authorize: AuthJWT, db: AsyncSession) -> tuple[str, str, User]:        
+        access_token = await authorize.create_access_token(
+            subject=str(user.id),
+            expires_time=jwt_settings.access_expires,
+            user_claims={"user_id": str(user.id)}
+        )
+        refresh_token = await authorize.create_refresh_token(
+            subject=str(user.id),
+            expires_time=jwt_settings.refresh_expires,
+            user_claims={"user_id": str(user.id)}
+        )
+
         await self.add_login_to_history(user, db)
-        return tokens.access_token, tokens.refresh_token, user
+
+        return access_token, refresh_token, user

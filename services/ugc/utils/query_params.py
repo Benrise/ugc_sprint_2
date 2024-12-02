@@ -1,15 +1,15 @@
+from typing import Optional, Dict, Any
 from urllib.parse import parse_qs
-from typing import Dict, Any
 from fastapi import Request
 
 
-def extract_query_params(request: Request, raw_params: str = None) -> Dict[str, Any]:
+def extract_query_params(request: Request, raw_params: Optional[str] = None) -> Dict[str, Any]:
     """
     Универсальный парсер query-параметров.
 
     Args:
         request (Request): FastAPI запрос.
-        raw_params (str): Необязательная строка параметров (например, из другого источника).
+        raw_params (Optional[str]): Необязательная строка параметров (например, из другого источника).
 
     Returns:
         Dict[str, Any]: Словарь параметров, где ключи — названия параметров, значения — их значения.

@@ -47,7 +47,7 @@ class User(Base):
         self.credentials_updated = credentials_updated
 
     def check_password(self, password: str) -> bool:
-        return check_password_hash(self.password, password)
+        return check_password_hash(self.password, password)  # type: ignore
 
     def __repr__(self) -> str:
         return f'<User {self.login}>'

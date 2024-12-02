@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import List
 
 from async_fastapi_jwt_auth import AuthJWT
 from async_fastapi_jwt_auth.auth_jwt import AuthJWTBearer
@@ -49,7 +50,7 @@ async def get_users(
     user_service: UserService = Depends(get_user_service),
     db: AsyncSession = Depends(get_session),
     authorize: AuthJWT = Depends(auth_dep)
-) -> list[UserInDBRole]:
+) -> List[UserInDBRole]:
     await authorize.jwt_required()
 
     return await user_service.get_all_users(db)

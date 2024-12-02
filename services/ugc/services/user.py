@@ -7,7 +7,7 @@ from core.config import settings
 
 
 class UserService:
-    async def get_user_id_from_jwt(self, request: Request) -> Optional[str]:            
+    async def get_user_id_from_jwt(self, request: Request) -> Optional[str]:
         try:
             token = request.cookies.get("access_token_cookie")
             if not token:
@@ -17,7 +17,7 @@ class UserService:
             user_id = payload.get("user_id")
             if user_id is None:
                 raise ValueError("user_id отсутствует в токене")
-            return user_id
+            return str(user_id)
         except PyJWTError as e:
             print(f"Ошибка декодирования токена: {e}")
             return None

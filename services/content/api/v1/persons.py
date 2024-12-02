@@ -1,3 +1,4 @@
+from typing import List
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -29,7 +30,7 @@ async def person_details(person_id: str, person_service: PersonService = Depends
 
 
 @router.get('/search/',
-            response_model=list[PersonFilms],
+            response_model=List[PersonFilms],
             summary='Получить список людей',
             description='Формат массива данных ответа: uuid, full_name, films')
 async def persons_list(
@@ -39,7 +40,7 @@ async def persons_list(
             description=config.QUERY_DESC
         ),
         pagination: PaginatedParams = Depends(),
-        person_service: PersonService = Depends(get_person_service)) -> list[PersonFilms]:
+        person_service: PersonService = Depends(get_person_service)) -> List[PersonFilms]:
     persons = await person_service.get_persons(
         query,
         pagination.page,
@@ -50,8 +51,8 @@ async def persons_list(
     return persons
 
 
-@router.get('/{person_id}/film', response_model=list[FilmRating])
-async def person_by_films(person_id: str, person_service: PersonService = Depends(get_person_service)) -> list[FilmRating]:
+@router.get('/{person_id}/film', response_model=List[FilmRating])
+async def person_by_films(person_id: str, person_service: PersonService = Depends(get_person_service)) -> List[FilmRating]:
     person_films = await person_service.get_person_film_rating(person_id)
     if not person_films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')

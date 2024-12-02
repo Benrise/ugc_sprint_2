@@ -1,3 +1,4 @@
+from typing import List
 from http import HTTPStatus
 
 from fastapi import HTTPException
@@ -16,7 +17,7 @@ class RoleService:
     def __init__(self, cache: Redis) -> None:
         self.cache = cache
 
-    async def _add_to_db(self, obj, db: AsyncSession) -> object | None:
+    async def _add_to_db(self, obj: Role | User, db: AsyncSession) -> object | None:
         try:
             db.add(obj)
             await db.commit()
@@ -25,19 +26,19 @@ class RoleService:
         except IntegrityError as e:
             msg = str(e.orig).split("\n")[1][9:]
             raise HTTPException(status_code=HTTPStatus.FOUND, detail=msg)
-        
+
     async def create_role(self, role_create: RoleCreate, db: AsyncSession) -> RoleInDB | None:
         user_dto = jsonable_encoder(role_create)
         user = Role(**user_dto)
         res = await self._add_to_db(user, db)
         return res
-    
+
     async def role_validation(self, role_id: str, db: AsyncSession) -> int:
         role = await db.execute(select(Role).where(Role.id == role_id))
         role = role.scalars().first()
         if not role:
             raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Role not found")
-        return role.id
+        return int(role.id)
 
     async def add_role(self, user: User, role_id: int, db: AsyncSession) -> User:
         user.role_id = role_id
@@ -55,7 +56,7 @@ class RoleService:
         await db.execute(query)
         await db.commit()
 
-    async def get_all_roles(self, db: AsyncSession) -> list[RoleInDB]:
+    async def get_all_roles(self, db: AsyncSession) -> List[RoleInDB]:
         query = await db.execute(select(Role))
         roles = query.scalars().all()
         return roles

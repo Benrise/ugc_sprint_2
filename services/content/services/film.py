@@ -1,12 +1,7 @@
-from functools import lru_cache
-
-from http import HTTPStatus
-
 import orjson
 
-from elasticsearch import NotFoundError, BadRequestError
-
-from fastapi import Depends, HTTPException
+from functools import lru_cache
+from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
 
 from db.elastic import get_search_service
@@ -15,6 +10,7 @@ from db.redis import get_cache
 from models.film import FilmModel, FilmRating
 
 from utils.abstract import AsyncCacheStorage, AsyncSearchService
+from utils.enums import Sort
 
 
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5
@@ -65,15 +61,15 @@ class FilmService:
         page -= 1
         body = {"from": page, "size": size, "query": {"match": {"title": {"query": query}}}}
         doc = await self.search_service.search(
-                index='movies',
-                body=body,
-                _source_includes=['uuid', 'title', 'imdb_rating']
-            )
+            index='movies',
+            body=body,
+            _source_includes=['uuid', 'title', 'imdb_rating']
+        )
         return [FilmRating(**i['_source']) for i in doc['hits']['hits']]
 
     async def get_films(
-            self, genre: str, sort_field: str, sort_order: str,  page: int, size: int
-        ) -> list[FilmRating]:
+            self, genre: str, sort_field: str, sort_order: Sort, page: int, size: int
+    ) -> list[FilmRating]:
         cache_key = 'film:rating:all'
         if genre:
             cache_key = f'film:rating:genre:{genre}'
@@ -91,8 +87,8 @@ class FilmService:
         return films
 
     async def _get_films_from_search_service(
-            self, genre: str, sort_field: str, sort_order: str,  page: int, size: int
-        ) -> list[FilmRating] | None:
+            self, genre: str, sort_field: str, sort_order: Sort, page: int, size: int
+    ) -> list[FilmRating] | None:
         sort = sort_order.value
         page -= 1
         body = {"from": page, "size": size, "sort": {sort_field: {"order": sort}}}
@@ -100,7 +96,7 @@ class FilmService:
             body["query"] = {
                 "nested": {
                     "path": "genres", "query": {
-                        "bool": {"must": [{"match": {"genres.uuid": genre}},]}
+                        "bool": {"must": [{"match": {"genres.uuid": genre}}]}
                     },
                 }
             }
@@ -110,7 +106,7 @@ class FilmService:
             _source_includes=['uuid', 'title', 'imdb_rating']
         )
         films = [FilmRating(**doc['_source']) for doc in response['hits']['hits']]
-        return films
+        return films if films else []
 
     async def _films_from_cache(self, cache_key: str) -> list[FilmRating] | None:
         films = await self.cache.get(cache_key)

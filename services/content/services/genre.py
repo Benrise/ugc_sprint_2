@@ -57,14 +57,15 @@ class GenreService:
 
     async def _get_genres_from_search_service(self, body) -> list[GenreModel] | None:
         response = await self.search_service.search(index='genres', body=body)
-        genres = [GenreModel(**doc['_source']) for doc in response['hits']['hits']]
+        genres: list[GenreModel] = [GenreModel(**doc['_source']) for doc in response['hits']['hits']]
         return genres
 
     async def _genres_from_cache(self, cache_key: str) -> list[GenreModel] | None:
-        genres: list[GenreModel] = await self.cache.get(cache_key)
+        genres = await self.cache.get(cache_key)
         if not genres:
             return None
-        return orjson.loads(genres)
+        genres_list: list[GenreModel] = [GenreModel.model_validate_json(genre) for genre in orjson.loads(genres)]
+        return genres_list
 
     async def _put_genres_to_cache(self, genres: list[GenreModel], cache_key: str):
         await self.cache.set(

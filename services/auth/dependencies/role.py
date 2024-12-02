@@ -1,4 +1,4 @@
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException, Depends, Request
 from http import HTTPStatus
 from functools import wraps, lru_cache
 
@@ -12,7 +12,8 @@ def roles_required(roles_list: list[UserRoles]):
     def decorator(fuction):
         @wraps(fuction)
         async def wrapper(*args, **kwargs):
-            user: UserInDBRole = kwargs.get('request').custom_user
+            request: Request = kwargs.get('request')
+            user: UserInDBRole = getattr(request, 'custom_user', None)
             if not user:
                 raise HTTPException(
                     status_code=HTTPStatus.FORBIDDEN,

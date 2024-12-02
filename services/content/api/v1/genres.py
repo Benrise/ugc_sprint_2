@@ -1,8 +1,9 @@
-import core.config as config
-
+from typing import List
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException
+
+import core.config as config
 
 from services.genre import GenreService, get_genre_service
 from models.genre import Genre
@@ -27,10 +28,10 @@ async def film_details(genre_id: str, genre_service: GenreService = Depends(get_
 
 
 @router.get('',
-            response_model=list[Genre],
+            response_model=List[Genre],
             summary='Получить список жанров',
             description='Формат массива данных ответа: uuid, name, ')
-async def genre_list(film_service: GenreService = Depends(get_genre_service)) -> list[Genre]:
+async def genre_list(film_service: GenreService = Depends(get_genre_service)) -> List[Genre]:
     films = await film_service.get_genres(size=config.MAX_GENRES_SIZE)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='genres not found')

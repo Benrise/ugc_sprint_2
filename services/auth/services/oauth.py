@@ -44,7 +44,7 @@ class OAuthService:
         self.user_service = user_service
         self.oauth = OAuth()
         self.yandex_config = OAuthYandexSettings()
-        self.providers = {}
+        self.providers: dict[str, OAuthProvider] = {}
         self._register_providers()
 
     def _register_providers(self):
@@ -81,8 +81,10 @@ class OAuthService:
             logger.error(f"Error during redirect to OAuth provider: {e}")
             raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="OAuth redirect failed")
 
-    async def authenticate(self, request, provider: str, authorize: AuthJWT, db: AsyncSession) -> [str, str, User]:
+    async def authenticate(self, request: Request, provider: str, authorize: AuthJWT, db: AsyncSession) -> tuple[str, str, User]:
         client = await self.get_provider(provider)
+        if not client:
+            raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="OAuth provider not found")
         try:
             token = await client.authorize_access_token(request)
         except OAuthError as error:
@@ -90,8 +92,10 @@ class OAuthService:
         user_data = await client.process_token(token)
 
         oauth_user = await self.db.scalar(
-            select(OAuth2User).where(OAuth2User.oauth_id == user_data.user_id,
-                                     OAuth2User.provider == provider)
+            select(OAuth2User).where(
+                OAuth2User.oauth_id == user_data.user_id,
+                OAuth2User.provider == provider
+            )
         )
 
         if oauth_user:
@@ -99,11 +103,13 @@ class OAuthService:
         else:
             try:
                 login = generate_unique_login()
-                user = User(login=login,
-                            password=str(uuid.uuid4()),
-                            email=user_data.email,
-                            is_oauth2=True,
-                            credentials_updated=False)
+                user = User(
+                    login=login,
+                    password=str(uuid.uuid4()),
+                    email=user_data.email,
+                    is_oauth2=True,
+                    credentials_updated=False
+                )
                 self.db.add(user)
                 await self.db.flush()
                 oauth_user = OAuth2User(oauth_id=user_data.user_id, provider=provider, user_id=user.id)

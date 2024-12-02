@@ -121,7 +121,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 if DEBUG:
     import socket
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-    INTERNAL_IPS = [ip[:-1] + '5' for ip in ips] + os.environ.get('ADMIN_INTERNAL_IPS').split(',')
+    admin_ips = os.environ.get('ADMIN_INTERNAL_IPS', '')
+    INTERNAL_IPS = [ip[:-1] + '5' for ip in ips] + admin_ips.split(',')
     MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
     INSTALLED_APPS += ['debug_toolbar']
     INSTALLED_APPS += ['django_extensions']

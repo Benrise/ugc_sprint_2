@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing_extensions import TypedDict
 
 
-id_role_dict = TypedDict('RoleID', {'uuid': str, 'roles': list[str]})
+id_role_dict = TypedDict('id_role_dict', {'uuid': str, 'roles': list[str]})
 
 
 class Person(BaseModel):
