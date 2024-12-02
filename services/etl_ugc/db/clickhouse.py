@@ -2,12 +2,18 @@ from typing import Any, Optional
 
 from utils.logger import logger
 from utils.abstract import AnalyticDatabaseService
-from utils.sql_queries import (MOVIE_PROGRESS_QUERY, MOVIE_FILTERS_QUERY, MOVIE_DETAILS_QUERY)
+from utils.sql_queries import (
+    MOVIE_PROGRESS_QUERY,
+    MOVIE_FILTERS_QUERY,
+    MOVIE_DETAILS_QUERY
+)
 
 from aiochclient import ChClient
 
 
 class ClickHouseAdapter(AnalyticDatabaseService):
+    LOGNAME = "ClickHouseAdapter"
+
     def __init__(self, client: ChClient):
         self.client = client
 
@@ -16,9 +22,9 @@ class ClickHouseAdapter(AnalyticDatabaseService):
             await self.execute(MOVIE_PROGRESS_QUERY["create_table"])
             await self.execute(MOVIE_FILTERS_QUERY["create_table"])
             await self.execute(MOVIE_DETAILS_QUERY["create_table"])
-            logger.info(f"[{self.__class__.__name__}] ClickHouse init tables created successfully")
+            logger.info(f"[{self.LOGNAME}] ClickHouse init tables created successfully")
         except Exception as e:
-            logger.error(f"[{self.__class__.__name__}] Error occurred while creating init tables: {str(e)}")
+            logger.error(f"[{self.LOGNAME}] Error occurred while creating init tables: {str(e)}")
 
     async def execute(
             self,
@@ -29,18 +35,18 @@ class ClickHouseAdapter(AnalyticDatabaseService):
     ) -> Any:
         try:
             if not query.strip().upper().startswith("CREATE"):
-                logger.info('Executing query with params/args...')
+                logger.info(f'[{self.LOGNAME}] Executing query with params/args...')
                 result = await self.client.execute(
                     query, *args, params=params, query_id=query_id
                 )
             else:
-                logger.info('Executing query without params/args...')
+                logger.info(f'[{self.LOGNAME}] Executing query without params/args...')
                 result = await self.client.execute(query, query_id=query_id)
 
-            logger.info(f"[{self.__class__.__name__}] Query executed successfully: {query}")
+            logger.info(f"[{self.LOGNAME}] Query executed successfully: {query}")
             return result
         except Exception as e:
-            logger.error(f"[{self.__class__.__name__}] Error executing {query}: {e}")
+            logger.error(f"[{self.LOGNAME}] Error executing {query}: {e}")
             raise
 
     async def fetch(
@@ -58,15 +64,15 @@ class ClickHouseAdapter(AnalyticDatabaseService):
                 decode=decode
             )
         except Exception as e:
-            logger.error(f"[{self.__class__.__name__}] Error on fetch: {e}")
+            logger.error(f"[{self.LOGNAME}] Error on fetch: {e}")
             return None
 
     async def health_check(self) -> Any:
         try:
             response = await self.fetch("SELECT version()")
             if response:
-                logger.info(f"[{self.__class__.__name__}] Successfully connected to ClickHouse")
+                logger.info(f"[{self.LOGNAME}] Successfully connected")
             else:
-                logger.error(f"[{self.__class__.__name__}] Failed to get response from ClickHouse: {response}")
+                logger.error(f"[{self.LOGNAME}] Failed to get response: {response}")
         except Exception as e:
-            logger.error(f"[{self.__class__.__name__}] Error occurred while connecting to ClickHouse: {str(e)}")
+            logger.error(f"[{self.LOGNAME}] Error occurred while connecting: {str(e)}")
