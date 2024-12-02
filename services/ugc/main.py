@@ -6,10 +6,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
-from motor.motor_asyncio import AsyncIOMotorClient
-from beanie import init_beanie
 
-from api.v1 import producer
+from api.v1 import (
+    producer,
+    reviews,
+    review_likes,
+    film_ratings,
+    bookmarks
+)
 
 from core.config import settings
 from core.logger import LOGGING
@@ -55,6 +59,11 @@ async def health_check():
     }
 
 app.include_router(producer.router, prefix='/ugc/api/v1/produce', tags=['produce'])
+app.include_router(reviews.router, prefix='/ugc/api/v1/reviews', tags=['reviews'])
+app.include_router(review_likes.router, prefix='/ugc/api/v1/review_likes', tags=['review_likes'])
+app.include_router(film_ratings.router, prefix='/ugc/api/v1/film_ratings', tags=['film_ratings'])
+app.include_router(bookmarks.router, prefix='/ugc/api/v1/bookmarks', tags=['bookmarks'])
+
 
 if __name__ == '__main__':
     uvicorn.run(
