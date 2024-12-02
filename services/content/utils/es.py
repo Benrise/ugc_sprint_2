@@ -8,7 +8,7 @@ def build_body(
     sort_order: Optional[str] = None,
     sort_field: Optional[str] = None,
     genre_id: Optional[str] = None
-) -> Dict[str, Any]:
+) -> Dict[str, Dict[str, Any]]:
     bool_clause = {"must": [{"multi_match": {"query": query}}]} if query else {}
     sort_clause = {sort_field: {"order": sort_order}} if sort_order and sort_field else {}
 

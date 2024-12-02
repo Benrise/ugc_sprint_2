@@ -31,7 +31,8 @@ class MongoDBAdapter(AsyncNoSQLDatabaseService):
     async def find_many(self, collection: str, query: Dict[str, Any]) -> List[Dict[str, Any]]:
         try:
             cursor = self.database[collection].find(query)
-            return await cursor.to_list(length=None)
+            result = await cursor.to_list(length=None)
+            return result
         except Exception:
             return []
 

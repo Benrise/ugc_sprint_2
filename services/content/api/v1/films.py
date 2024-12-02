@@ -5,7 +5,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from services.film import FilmService, get_film_service
-from services.ugc import UGCEventService
+from services.event import UGCEventService
 
 from utils.enums import Sort, EventType
 

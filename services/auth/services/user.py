@@ -78,11 +78,13 @@ class UserService:
             .limit(size)
             .offset(offset)
         )
-        return query.scalars().all()
+        users: List[UserHistory] = query.scalars().all()
+        return users
 
     async def get_all_users(self, db: AsyncSession) -> List[UserInDB]:
         query = await db.execute(select(User))
-        return query.scalars().all()
+        users: List[UserInDB] = query.scalars().all()
+        return users
 
     async def complete_oauth2_authentication(self, user: User, _: Request, authorize: AuthJWT, db: AsyncSession) -> tuple[str, str, User]:        
         access_token = await authorize.create_access_token(

@@ -58,5 +58,5 @@ class RoleService:
 
     async def get_all_roles(self, db: AsyncSession) -> List[RoleInDB]:
         query = await db.execute(select(Role))
-        roles = query.scalars().all()
+        roles: List[RoleInDB] = query.scalars().all()
         return roles

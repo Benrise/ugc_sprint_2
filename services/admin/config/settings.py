@@ -8,7 +8,7 @@ SECRET_KEY = os.environ.get('ADMIN_SECRET_KEY')
 
 DEBUG = os.environ.get('ADMIN_DEBUG', False) == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ADMIN_ALLOWED_HOSTS').split(',')
+ALLOWED_HOSTS = os.environ.get('ADMIN_ALLOWED_HOSTS', '').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',

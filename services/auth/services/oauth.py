@@ -119,5 +119,5 @@ class OAuthService:
                 logger.error(f"Database error during user creation: {e}")
                 await self.db.rollback()
                 raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="User creation failed")
-
-        return await self.user_service.complete_oauth2_authentication(user, request, authorize, db)
+        result: tuple[str, str, User] = await self.user_service.complete_oauth2_authentication(user, request, authorize, db)
+        return result
