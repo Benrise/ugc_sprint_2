@@ -46,5 +46,8 @@ services/es/data
 # clickhouse data
 services/clickhouse/data
 
+# mongodb data
+services/mongodb/data
+
 # logs data
 logs/

@@ -6,6 +6,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
+from motor.motor_asyncio import AsyncIOMotorClient
+from beanie import init_beanie
 
 from api.v1 import producer
 
@@ -14,9 +16,11 @@ from core.logger import LOGGING
 
 from dependencies import kafka
 
+from db.init_db import init_mongodb
+
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_: FastAPI):
     kafka.kafka_producer = AIOKafkaProducer(
             bootstrap_servers=settings.kafka_bootstrap_servers,
             client_id='ugc'
@@ -25,6 +29,8 @@ async def lifespan(app: FastAPI):
             group_id=settings.kafka_group_id,
             bootstrap_servers=settings.kafka_bootstrap_servers
         )
+
+    await init_mongodb()
 
     await kafka.kafka_consumer.start()
     await kafka.kafka_producer.start()

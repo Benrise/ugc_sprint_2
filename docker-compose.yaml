@@ -256,6 +256,15 @@ services:
       healthcheck:
         test: wget --no-verbose --tries=3 --spider http://localhost:8123/ping || exit 1
 
+    mongodb:
+      build: ./services/mongodb
+      container_name: mongodb
+      volumes:
+        - ./services/mongodb/data:/data/db
+      ports:
+        - ${UGC_MONGODB_PORTS}
+      restart: unless-stopped 
+
 volumes:
   kafka-0_data:
   kafka-1_data:
