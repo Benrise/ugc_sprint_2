@@ -1,6 +1,5 @@
 import json
 
-from datetime import datetime
 from typing import Optional
 
 from fastapi import (
@@ -14,6 +13,7 @@ from fastapi import (
 from services.user import UserService
 from dependencies.user import get_user_service
 from utils.enums import EventType
+from utils.broker import get_topic_name, prepare_event_data
 from dependencies.kafka import get_kafka_service
 from brokers.kafka import KafkaAdapter
 
@@ -34,17 +34,14 @@ async def send_to_broker(
     user_service: UserService = Depends(get_user_service),
     kafka_service: KafkaAdapter = Depends(get_kafka_service)
 ):
-    token = request.cookies.get("access_token_cookie")
-    user_id = await user_service.get_user_id(token)
+    user_id = await user_service.get_user_id_from_jwt(request)
 
     data = await request.json()
     if not data:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Data is required")
 
-    data["date_event"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    data["user_id"] = user_id
-
-    topic = f"{event_type}-events"
+    data = prepare_event_data(data, user_id)
+    topic = get_topic_name(event_type)
 
     await kafka_service.produce(topic=topic, key=event_type, value=json.dumps(data))
 

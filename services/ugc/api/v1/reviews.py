@@ -15,14 +15,13 @@ async def create_review(
     content: str,
     user_service: UserService = Depends(get_user_service),
 ):
-    token = request.cookies.get("access_token_cookie")
-    user_id = await user_service.get_user_id(token)
+    user_id = await user_service.get_user_id_from_jwt(request)
 
     review = Review(
         author_id=user_id,
         movie_id=movie_id,
         text=content,
-        created_at=datetime.now(),
+        created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     )
     await review.create()
     return {"message": "Review created successfully", "review": review}

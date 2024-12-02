@@ -13,8 +13,7 @@ async def rate_film(
     stars: int,
     user_service: UserService = Depends(get_user_service),
 ):
-    token = request.cookies.get("access_token_cookie")
-    user_id = await user_service.get_user_id(token)
+    user_id = await user_service.get_user_id_from_jwt(request)
 
     if not (0 <= stars <= 10):
         raise HTTPException(status_code=400, detail="Rating must be between 0 and 10")
@@ -35,8 +34,7 @@ async def get_movie_ratings(
     movie_id: str,
     user_service: UserService = Depends(get_user_service),
 ):
-    token = request.cookies.get("access_token_cookie")
-    await user_service.get_user_id(token)
+    await user_service.get_user_id_from_jwt(request)
 
     stars = await FilmRating.find(FilmRating.movie_id == movie_id).to_list()
     average_rating = sum(r.stars for r in stars) / len(stars) if stars else 0

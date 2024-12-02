@@ -13,8 +13,7 @@ async def like_review(
     is_liked: bool,
     user_service: UserService = Depends(get_user_service),
 ):
-    token = request.cookies.get("access_token_cookie")
-    user_id = await user_service.get_user_id(token)
+    user_id = await user_service.get_user_id_from_jwt(request)
 
     existing_like = await ReviewLike.find_one(ReviewLike.user_id == user_id, ReviewLike.review_id == review_id)
     if existing_like:
@@ -32,8 +31,7 @@ async def get_review_likes(
     request: Request, review_id: str, 
     user_service: UserService = Depends(get_user_service)
 ):
-    token = request.cookies.get("access_token_cookie")
-    await user_service.get_user_id(token)
+    await user_service.get_user_id_from_jwt(request)
 
     likes = await ReviewLike.find(ReviewLike.review_id == review_id).to_list()
     total_likes = sum(1 for like in likes if like.is_liked)

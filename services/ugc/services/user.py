@@ -1,4 +1,5 @@
 import jwt
+from fastapi import Request
 from jwt import PyJWTError
 from typing import Optional
 
@@ -6,8 +7,12 @@ from core.config import settings
 
 
 class UserService:
-    async def get_user_id(self, token: str) -> Optional[str]:
+    async def get_user_id_from_jwt(self, request: Request) -> Optional[str]:            
         try:
+            token = request.cookies.get("access_token_cookie")
+            if not token:
+                raise PyJWTError("Отсутствует токен")
+
             payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
             user_id = payload.get("user_id")
             if user_id is None:
