@@ -267,6 +267,53 @@ services:
         - ${UGC_MONGODB_PORTS}
       restart: unless-stopped 
 
+    elk-kibana:
+      container_name: "elk-kibana"
+      image: kibana:8.12.1
+      ports:
+        - ${ELK_KIBANA_PORTS}
+      depends_on: 
+        - elk-elasticsearch
+      env_file:
+        - .env
+      volumes:
+        - "./services/elk-kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml"
+      healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:${ELK_KIBANA_PORT}"]
+        retries: 300
+        interval: 2s
+
+    elk-elasticsearch:
+      container_name: "elk-elasticsearch"
+      image: elasticsearch:8.12.1
+      ports:
+        - ${ELK_ELASTIC_PORTS}
+      env_file:
+        - .env
+      volumes:
+        - ./services/elk-es/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+        - ./services/elk-es/data:/usr/share/elasticsearch/data
+      healthcheck:
+        test: ["CMD-SHELL", "curl -s http://localhost:${ELK_ELASTIC_PORT}/_cat/health?h=status | grep -q green"]
+        retries: 90
+        interval: 3s
+
+    elk-logstash:
+      container_name: "elk-logstash"
+      image: logstash:8.10.2
+      depends_on: 
+        - elk-elasticsearch
+      env_file:
+        - .env
+      environment:
+        XPACK_MONITORING_ENABLED: "false"
+        ES_HOST: "${ELK_ELASTIC_HOST}:9200"
+      ports:
+        - ${ELK_LOGSTASH_PORTS}
+      volumes:
+        - ./services/elk-logstash/logstash.conf:/config/logstash.conf:ro
+      command: logstash -f /config/logstash.conf 
+
 volumes:
   kafka-0_data:
   kafka-1_data:

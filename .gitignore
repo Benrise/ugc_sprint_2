@@ -54,3 +54,6 @@ logs/
 
 # github actions artifacts
 flake8-report
+
+# elk elastic data
+services/elk-es/data
