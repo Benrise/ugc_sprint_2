@@ -11,6 +11,7 @@ jobs:
     name: Code Linting and Type Checking
     permissions:
       contents: write
+    environment: CI Yandex Practicum
     runs-on: ubuntu-latest
 
     strategy:
