@@ -1,0 +1,21 @@
+name: "elk-nginx-filebeat"
+logging.metrics.enabled: false
+xpack.security.enabled: false
+xpack.monitoring.enabled: false
+setup.ilm.enabled: false
+setup.template.enabled: false
+
+filebeat.inputs:
+- type: filestream
+  scan_frequency: 1s
+  enabled: true
+  paths:
+    - /var/log/nginx/*
+  tags: ["nginx"]
+  json:
+    keys_under_root: true
+    add_error_key: true
+
+output.logstash:
+  enabled: true
+  hosts: ["${ELK_LOGSTASH_HOST}:${ELK_LOGSTASH_PORT}"]
