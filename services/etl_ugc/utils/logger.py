@@ -1,7 +1,8 @@
 import logging
 import os
 from datetime import datetime
-from logging.handlers import RotatingFileHandler
+from logging.handlers import RotatingFileHandler, SocketHandler
+from core.config import elk_settings
 
 logs_dir = "./logs"
 os.makedirs(logs_dir, exist_ok=True)
@@ -24,5 +25,10 @@ error_handler = RotatingFileHandler(error_log_file, maxBytes=10_000_000, backupC
 error_handler.setFormatter(formatter)
 error_handler.setLevel(logging.ERROR)
 
+logstash_handler = SocketHandler(elk_settings.logstash_host, elk_settings.logstash_port)
+logstash_handler.setFormatter(formatter)
+logstash_handler.setLevel(logging.INFO)
+
 logger.addHandler(main_handler)
 logger.addHandler(error_handler)
+logger.addHandler(logstash_handler)

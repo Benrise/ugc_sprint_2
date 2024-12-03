@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 
 from aiokafka import AIOKafkaConsumer
-from core.settings import settings
+from core.config import settings
 from db.clickhouse import ClickHouseAdapter
 from schemas.events import MovieDetailsEvent, MovieFiltersEvent, MovieProgressEvent
 from utils.logger import logger

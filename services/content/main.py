@@ -6,9 +6,10 @@ import uvicorn
 from api.v1 import films, genres, persons
 from core.config import settings
 from core.logger import LOGGING
+from utils.logger import logger
 from db import elastic, redis
 from elasticsearch import AsyncElasticsearch
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request, status
 from fastapi.responses import ORJSONResponse
 from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
@@ -40,6 +41,19 @@ app = FastAPI(
     lifespan=lifespan,
     dependencies=[Depends(RateLimiter(times=5, seconds=10))],
 )
+
+
+@app.middleware('http')
+async def before_request(request: Request, call_next):
+    response = await call_next(request)
+    request_id = request.headers.get('X-Request-Id')
+    if not request_id:
+        return ORJSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={'detail': 'X-Request-Id is required'})
+
+    logger.info(f"Request: {request.method} {request.url}")
+    logger.info(f"Response: {response.status_code}")
+
+    return response
 
 
 @app.get("/health")

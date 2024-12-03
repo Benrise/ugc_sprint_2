@@ -7,6 +7,7 @@ from api.v1 import roles, users
 from async_fastapi_jwt_auth.exceptions import AuthJWTException
 from core.config import settings
 from core.logger import LOGGING
+from utils.logger import logger
 from db import redis
 from dependencies.jwt import get_current_user_global
 from fastapi import Depends, FastAPI, Request, status
@@ -78,6 +79,10 @@ async def before_request(request: Request, call_next):
     request_id = request.headers.get('X-Request-Id')
     if not request_id:
         return ORJSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={'detail': 'X-Request-Id is required'})
+
+    logger.info(f"Request: {request.method} {request.url}")
+    logger.info(f"Response: {response.status_code}")
+
     return response
 
 

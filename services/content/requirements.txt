@@ -10,3 +10,4 @@ python-dotenv==1.0.1
 fastapi-limiter==0.1.6
 httpx==0.28.0
 hawkcatcher==3.4.1
+python-logstash==0.4.8

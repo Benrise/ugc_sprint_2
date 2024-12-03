@@ -47,3 +47,11 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+class ELKSettings(BaseSettings):
+    logstash_host: str = Field(..., alias='ELK_LOGSTASH_HOST')
+    logstash_port: int = Field(..., alias='ELK_LOGSTASH_PORT')
+
+
+elk_settings = ELKSettings()

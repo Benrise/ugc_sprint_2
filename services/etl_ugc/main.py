@@ -1,7 +1,7 @@
 import asyncio
 
 from aiohttp import ClientSession
-from core.settings import settings
+from core.config import settings
 from db.clickhouse import ClickHouseAdapter
 from dependencies.clickhouse import get_clickhouse_service
 from services.etl import ETLService

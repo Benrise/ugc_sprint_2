@@ -7,9 +7,10 @@ from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from api.v1 import bookmarks, film_ratings, producer, review_likes, reviews
 from core.config import settings
 from core.logger import LOGGING
+from utils.logger import logger
 from db.init_db import init_mongodb
 from dependencies import kafka
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
 from fastapi.responses import ORJSONResponse
 
 from hawkcatcher import Hawk
@@ -43,6 +44,19 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
     lifespan=lifespan
 )
+
+
+@app.middleware('http')
+async def before_request(request: Request, call_next):
+    response = await call_next(request)
+    request_id = request.headers.get('X-Request-Id')
+    if not request_id:
+        return ORJSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={'detail': 'X-Request-Id is required'})
+
+    logger.info(f"Request: {request.method} {request.url}")
+    logger.info(f"Response: {response.status_code}")
+
+    return response
 
 
 @app.get("/health")
