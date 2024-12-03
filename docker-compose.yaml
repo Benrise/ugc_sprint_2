@@ -100,6 +100,10 @@ services:
         test: ["CMD-SHELL", "curl -s http://localhost:${ETL_ELASTIC_PORT}/_cat/health?h=status | grep -q green"]
         retries: 90
         interval: 3s
+      deploy:
+        resources:
+          limits:
+            memory: 4GB
 
     etl_content:
       container_name: "etl_content"
@@ -312,7 +316,11 @@ services:
         - ${ELK_LOGSTASH_PORTS}
       volumes:
         - ./services/elk-logstash/logstash.conf:/config/logstash.conf:ro
-      command: logstash -f /config/logstash.conf 
+      command: logstash -f /config/logstash.conf
+      deploy:
+        resources:
+          limits:
+            memory: 4GB
 
 volumes:
   kafka-0_data:
