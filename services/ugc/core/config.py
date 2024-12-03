@@ -12,6 +12,7 @@ logging_config.dictConfig(LOGGING)
 
 class Settings(BaseSettings):
     project_name: str = Field(..., alias='UGC_PROJECT_NAME')
+    service_host: str = Field('ugc', alias='UGC_SERVICE_HOST')
     service_port: int = Field(8003, alias='UGC_SERVICE_PORT')
     jwt_secret_key: str = Field(..., alias='UGC_JWT_SECRET_KEY')
     jwt_algorithm: str = Field(..., alias='UGC_JWT_ALGORITHM')
