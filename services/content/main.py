@@ -14,7 +14,9 @@ from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
 from redis.asyncio import Redis
 
-from hawkcatcher.modules.fastapi import HawkFastapi
+from hawkcatcher import Hawk
+
+hawk = Hawk(settings.hawk_integration_token)
 
 
 @asynccontextmanager
@@ -38,11 +40,6 @@ app = FastAPI(
     lifespan=lifespan,
     dependencies=[Depends(RateLimiter(times=5, seconds=10))],
 )
-
-hawk = HawkFastapi({
-    "app_instance": app,
-    "token": settings.hawk_integration_token
-})
 
 
 @app.get("/health")
