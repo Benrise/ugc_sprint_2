@@ -103,6 +103,19 @@ services:
         timeout: 5s
         retries: 3
 
+    elk-content-filebeat:
+      container_name: elk-content-filebeat
+      build:
+        context: ./services/content/filebeat
+      env_file:
+        - .env
+      volumes:
+        - ./services/content/logs:/var/app/log
+      depends_on:
+        - content
+        - elk-elasticsearch
+        - elk-logstash
+
     elasticsearch:
       container_name: "elasticsearch"
       image: elasticsearch:8.12.1
