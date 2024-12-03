@@ -43,6 +43,7 @@ class Settings(BaseSettings):
     ugc_host: str = Field('ugc', alias='UGC_SERVICE_HOST')
     ugc_port: int = Field(8003, alias='UGC_SERVICE_PORT')
     debug: bool = Field(True, alias='API_DEBUG')
+    hawk_integration_token: str = Field(..., alias='HAWK_INTEGRATION_TOKEN')
 
 
 settings = Settings()

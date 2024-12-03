@@ -14,6 +14,10 @@ from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
 from redis.asyncio import Redis
 
+from hawkcatcher import Hawk
+
+hawk = Hawk(settings.hawk_integration_token)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

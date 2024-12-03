@@ -42,6 +42,7 @@ class Settings(BaseSettings):
     enable_tracing: bool = Field(..., alias='AUTH_ENABLE_TRACING')
     tracer_host: str = Field(..., alias='AUTH_TRACER_HOST')
     tracer_port: int = Field(..., alias='AUTH_TRACER_PORT')
+    hawk_integration_token: str = Field(..., alias='HAWK_INTEGRATION_TOKEN')
 
 
 settings = Settings()

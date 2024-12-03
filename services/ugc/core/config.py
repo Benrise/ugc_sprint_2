@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     mongodb_database_name: str = Field(..., alias='UGC_MONGODB_DATABASE_NAME')
     mongodb_host: str = Field(..., alias='UGC_MONGODB_HOST')
     mongodb_port: int = Field(..., alias='UGC_MONGODB_PORT')
+    hawk_integration_token: str = Field(..., alias='HAWK_INTEGRATION_TOKEN')
 
     @property
     def mongodb_base_url(self):

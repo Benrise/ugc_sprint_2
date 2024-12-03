@@ -12,6 +12,10 @@ from dependencies import kafka
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
+from hawkcatcher import Hawk
+
+hawk = Hawk(settings.hawk_integration_token)
+
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
