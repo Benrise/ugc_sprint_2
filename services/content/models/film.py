@@ -1,7 +1,6 @@
-from pydantic import BaseModel
-
-from models.person import Person
 from models.genre import Genre
+from models.person import Person
+from pydantic import BaseModel
 
 
 class FilmRating(BaseModel):

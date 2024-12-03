@@ -1,9 +1,14 @@
-import logging
 import datetime
-import uvicorn
-
+import logging
 from contextlib import asynccontextmanager
+
+import uvicorn
+from api.v1 import roles, users
 from async_fastapi_jwt_auth.exceptions import AuthJWTException
+from core.config import settings
+from core.logger import LOGGING
+from db import redis
+from dependencies.jwt import get_current_user_global
 from fastapi import Depends, FastAPI, Request, status
 from fastapi.responses import JSONResponse, ORJSONResponse
 from fastapi_limiter import FastAPILimiter
@@ -13,16 +18,9 @@ from opentelemetry.exporter.jaeger.thrift import JaegerExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import (BatchSpanProcessor,
-                                            ConsoleSpanExporter)
+from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
 from redis.asyncio import Redis
 from starlette.middleware.sessions import SessionMiddleware
-
-from api.v1 import roles, users
-from dependencies.jwt import get_current_user_global
-from core.config import settings
-from core.logger import LOGGING
-from db import redis
 
 
 @asynccontextmanager
@@ -84,8 +82,10 @@ def authjwt_exception_handler(_: Request, exc: AuthJWTException):
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
 
 
-app.include_router(users.router, prefix='/auth/api/v1/users', tags=['users'], dependencies=[Depends(get_current_user_global)])
-app.include_router(roles.router, prefix='/auth/api/v1/roles', tags=['roles'], dependencies=[Depends(get_current_user_global)])
+app.include_router(users.router, prefix='/auth/api/v1/users',
+                   tags=['users'], dependencies=[Depends(get_current_user_global)])
+app.include_router(roles.router, prefix='/auth/api/v1/roles',
+                   tags=['roles'], dependencies=[Depends(get_current_user_global)])
 
 FastAPIInstrumentor.instrument_app(app)
 

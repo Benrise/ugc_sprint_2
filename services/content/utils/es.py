@@ -1,5 +1,5 @@
 # mypy: ignore-errors
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 
 def build_body(

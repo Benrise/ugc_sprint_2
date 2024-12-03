@@ -1,19 +1,13 @@
-import core.config as config
-
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
-
-from services.film import FilmService, get_film_service
-from services.event import UGCEventService
-
-from utils.enums import Sort, EventType
-
-from models.film import Film, FilmRating
-from models.abstract import PaginatedParams
-
+import core.config as config
 from dependencies.ugc import get_ugc_service
-
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from models.abstract import PaginatedParams
+from models.film import Film, FilmRating
+from services.event import UGCEventService
+from services.film import FilmService, get_film_service
+from utils.enums import EventType, Sort
 
 router = APIRouter()
 

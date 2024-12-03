@@ -1,15 +1,14 @@
-from typing import List
 from http import HTTPStatus
+from typing import List
 
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
+from models.entity import Role, User
 from redis.asyncio import Redis
+from schemas.role import RoleCreate, RoleInDB
 from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from models.entity import Role, User
-from schemas.role import RoleCreate, RoleInDB
 from utils.enums import Roles
 
 

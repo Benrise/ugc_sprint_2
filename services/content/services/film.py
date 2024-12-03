@@ -1,18 +1,14 @@
-from typing import List, Optional
-import orjson
-
 from functools import lru_cache
-from fastapi import Depends
-from fastapi.encoders import jsonable_encoder
+from typing import List, Optional
 
+import orjson
 from db.elastic import get_search_service
 from db.redis import get_cache
-
+from fastapi import Depends
+from fastapi.encoders import jsonable_encoder
 from models.film import FilmModel, FilmRating
-
 from utils.abstract import AsyncCacheStorage, AsyncSearchService
 from utils.enums import Sort
-
 
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5
 

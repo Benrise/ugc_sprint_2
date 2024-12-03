@@ -1,10 +1,8 @@
-import psycopg2
 import typer
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
 from core.config import pg, settings
 from models.entity import User
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 DATABASE_URL = f'postgresql+psycopg2://{pg.user}:{pg.password}@{pg.host}:{pg.port}/{pg.db}'
 

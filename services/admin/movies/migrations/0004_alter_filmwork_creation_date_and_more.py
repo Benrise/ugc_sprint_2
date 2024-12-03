@@ -39,7 +39,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='filmwork',
             name='rating',
-            field=models.FloatField(blank=True, default=0.0, null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(10)], verbose_name='rating'),
+            field=models.FloatField(blank=True, default=0.0, null=True, validators=[django.core.validators.MinValueValidator(
+                0.0), django.core.validators.MaxValueValidator(10)], verbose_name='rating'),
         ),
         migrations.AlterField(
             model_name='genre',
@@ -49,6 +50,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='personfilmwork',
             name='role',
-            field=models.CharField(choices=[('director', 'Director'), ('writer', 'Writer'), ('actor', 'Actor')], max_length=20, verbose_name='role'),
+            field=models.CharField(choices=[('director', 'Director'), ('writer', 'Writer'),
+                                   ('actor', 'Actor')], max_length=20, verbose_name='role'),
         ),
     ]

@@ -1,12 +1,10 @@
-from motor.motor_asyncio import AsyncIOMotorClient
 from typing import Any, Dict, List, Optional
 
-from utils.abstract import AsyncNoSQLDatabaseService
-
+from motor.motor_asyncio import AsyncIOMotorClient
 from schemas.bookmark import Bookmark
 from schemas.film import FilmRating
 from schemas.review import Review, ReviewLike
-
+from utils.abstract import AsyncNoSQLDatabaseService
 
 MongoDocuments = [
     Bookmark,

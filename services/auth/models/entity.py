@@ -1,12 +1,11 @@
 import uuid
 from datetime import datetime
 
+from db.postgres import Base
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
-
-from db.postgres import Base
 
 
 class User(Base):
@@ -19,7 +18,7 @@ class User(Base):
     first_name = Column(String(50), nullable=True)
     last_name = Column(String(50), nullable=True)
     created_at = Column(DateTime, default=datetime.now())
-    
+
     credentials_updated = Column(Boolean, default=True)
 
     is_oauth2 = Column(Boolean, default=False)

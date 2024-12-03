@@ -1,7 +1,6 @@
+from core.config import settings
 from fastapi import Depends
 from redis.asyncio import Redis
-
-from core.config import settings
 from utils.abstract import AsyncCacheStorage
 
 redis: Redis | None = Redis(host=settings.redis_host, port=settings.redis_port, db=0, decode_responses=True)

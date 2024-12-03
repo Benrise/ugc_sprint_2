@@ -1,7 +1,6 @@
-from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
-from fastapi import Depends
-
+from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from brokers.kafka import KafkaAdapter
+from fastapi import Depends
 from utils.abstract import AsyncMessageBroker
 
 kafka_producer: AIOKafkaProducer | None = None

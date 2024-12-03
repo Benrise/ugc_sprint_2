@@ -1,6 +1,7 @@
 from datetime import datetime
-from beanie import Document
 from typing import Optional
+
+from beanie import Document
 
 
 class Review(Document):

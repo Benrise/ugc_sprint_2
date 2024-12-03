@@ -1,7 +1,5 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config, pool
-
 from alembic import context
 from core.config import pg
 from models.entity import Base
@@ -53,7 +51,6 @@ def run_migrations_offline() -> None:
 
 def run_migrations_online() -> None:
 
-    import os
     import re
 
     from sqlalchemy import create_engine

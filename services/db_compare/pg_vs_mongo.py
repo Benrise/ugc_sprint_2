@@ -1,6 +1,7 @@
 import asyncio
-import asyncpg
 import time
+
+import asyncpg
 from beanie import Document, init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 

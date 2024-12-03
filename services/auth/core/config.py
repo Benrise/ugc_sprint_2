@@ -2,10 +2,9 @@ import os
 from datetime import timedelta
 from logging import config as logging_config
 
+from core.logger import LOGGING
 from pydantic import Field
 from pydantic_settings import BaseSettings
-
-from core.logger import LOGGING
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

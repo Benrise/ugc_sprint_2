@@ -1,6 +1,6 @@
+from fastapi import Depends
 from redis.asyncio import Redis
 from utils.abstract import AsyncCacheStorage
-from fastapi import Depends
 
 redis: Redis | None = None
 

@@ -1,9 +1,9 @@
-from fastapi import Depends
 from functools import lru_cache
 
+from db.redis import get_redis
+from fastapi import Depends
 from redis.asyncio import Redis
 from services.user import UserService
-from db.redis import get_redis
 
 
 @lru_cache()

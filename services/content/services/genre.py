@@ -1,16 +1,13 @@
-import orjson
 from functools import lru_cache
 
-from elasticsearch import NotFoundError
-from fastapi import Depends
-from fastapi.encoders import jsonable_encoder
-
+import orjson
 from db.elastic import get_search_service
 from db.redis import get_cache
-
+from fastapi import Depends
+from fastapi.encoders import jsonable_encoder
 from models.genre import GenreModel
-from utils.es import build_body
 from utils.abstract import AsyncCacheStorage, AsyncSearchService
+from utils.es import build_body
 
 GENRE_CACHE_EXPIRE_IN_SECONDS = 60 * 5
 

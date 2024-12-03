@@ -1,9 +1,9 @@
-import jwt
-from fastapi import Request
-from jwt import PyJWTError
 from typing import Optional
 
+import jwt
 from core.config import settings
+from fastapi import Request
+from jwt import PyJWTError
 
 
 class UserService:

@@ -1,12 +1,10 @@
-from motor.motor_asyncio import AsyncIOMotorClient
-from pymongo.errors import ConnectionFailure
 from beanie import init_beanie
-
 from core.config import settings
 from db.mongodb import MongoDocuments
-from utils.logger import logger
-
 from dependencies import mongodb
+from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo.errors import ConnectionFailure
+from utils.logger import logger
 
 
 async def init_mongodb():

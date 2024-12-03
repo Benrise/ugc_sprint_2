@@ -1,38 +1,28 @@
-import logging
-import uvicorn
 import datetime
-
+import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
-from fastapi.responses import ORJSONResponse
-from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 
-from api.v1 import (
-    producer,
-    reviews,
-    review_likes,
-    film_ratings,
-    bookmarks
-)
-
+import uvicorn
+from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
+from api.v1 import bookmarks, film_ratings, producer, review_likes, reviews
 from core.config import settings
 from core.logger import LOGGING
-
-from dependencies import kafka
-
 from db.init_db import init_mongodb
+from dependencies import kafka
+from fastapi import FastAPI
+from fastapi.responses import ORJSONResponse
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     kafka.kafka_producer = AIOKafkaProducer(
-            bootstrap_servers=settings.kafka_bootstrap_servers,
-            client_id='ugc'
-        )
+        bootstrap_servers=settings.kafka_bootstrap_servers,
+        client_id='ugc'
+    )
     kafka.kafka_consumer = AIOKafkaConsumer(
-            group_id=settings.kafka_group_id,
-            bootstrap_servers=settings.kafka_bootstrap_servers
-        )
+        group_id=settings.kafka_group_id,
+        bootstrap_servers=settings.kafka_bootstrap_servers
+    )
 
     await init_mongodb()
 

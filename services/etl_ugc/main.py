@@ -1,12 +1,11 @@
 import asyncio
 
 from aiohttp import ClientSession
-
-from utils.logger import logger
+from core.settings import settings
 from db.clickhouse import ClickHouseAdapter
 from dependencies.clickhouse import get_clickhouse_service
-from core.settings import settings
 from services.etl import ETLService
+from utils.logger import logger
 
 
 async def main():

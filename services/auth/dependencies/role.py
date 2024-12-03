@@ -1,11 +1,11 @@
-from fastapi import HTTPException, Depends, Request
+from functools import lru_cache, wraps
 from http import HTTPStatus
-from functools import wraps, lru_cache
 
-from services.role import RoleService
-from schemas.user import UserInDBRole, UserRoles
 from db.redis import get_redis
+from fastapi import Depends, HTTPException, Request
 from redis.asyncio import Redis
+from schemas.user import UserInDBRole, UserRoles
+from services.role import RoleService
 
 
 def roles_required(roles_list: list[UserRoles]):

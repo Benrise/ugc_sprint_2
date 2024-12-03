@@ -3,28 +3,32 @@ from typing import List
 
 from async_fastapi_jwt_auth import AuthJWT
 from async_fastapi_jwt_auth.auth_jwt import AuthJWTBearer
-from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import RedirectResponse
-from sqlalchemy.ext.asyncio import AsyncSession
-
+from core.config import jwt_settings
 from db.postgres import get_session
 from db.redis import redis
-from models.abstract import PaginatedParams
-from core.config import jwt_settings
-from schemas.user import (ChangePassword, ChangeUsername,
-                          TokensResponse, UserCreate, UserHistoryInDB,
-                          UserInDB, UsernameLogin, UserRoles)
-from schemas.auth_request import AuthRequest
-from services.oauth import OAuthService
-from services.user import UserService
-from services.jwt import JWTService
-
-from dependencies.user import get_user_service
-from dependencies.role import roles_required
 from dependencies.jwt import get_jwt_service
 from dependencies.oauth import get_oauth_service
-
-from schemas.user import UserInDBRole
+from dependencies.role import roles_required
+from dependencies.user import get_user_service
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import RedirectResponse
+from models.abstract import PaginatedParams
+from schemas.auth_request import AuthRequest
+from schemas.user import (
+    ChangePassword,
+    ChangeUsername,
+    TokensResponse,
+    UserCreate,
+    UserHistoryInDB,
+    UserInDB,
+    UserInDBRole,
+    UsernameLogin,
+    UserRoles,
+)
+from services.jwt import JWTService
+from services.oauth import OAuthService
+from services.user import UserService
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 auth_dep = AuthJWTBearer()
@@ -140,7 +144,7 @@ async def refresh(
 @router.patch('/change-username', status_code=HTTPStatus.OK)
 async def change_username(
     login: ChangeUsername,
-    user_service: UserService = Depends(get_user_service), 
+    user_service: UserService = Depends(get_user_service),
     db: AsyncSession = Depends(get_session),
     authorize: AuthJWT = Depends(auth_dep)
 ) -> dict:
@@ -150,7 +154,7 @@ async def change_username(
     await user_service.change_login(login, user, db)
     await authorize.unset_jwt_cookies()
     return {"detail": "Username successfully updated"}
-    
+
 
 @router.patch('/change-password', status_code=HTTPStatus.OK)
 async def change_password(
@@ -168,9 +172,9 @@ async def change_password(
 
 
 @router.get(
-        '/login-history',
-        response_model=list[UserHistoryInDB],
-        status_code=HTTPStatus.OK)
+    '/login-history',
+    response_model=list[UserHistoryInDB],
+    status_code=HTTPStatus.OK)
 async def login_history(
     pagination: PaginatedParams = Depends(),
     user_service: UserService = Depends(get_user_service),

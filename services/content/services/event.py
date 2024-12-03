@@ -1,9 +1,7 @@
 import httpx
-
 from fastapi import Request
-
-from utils.logger import logger
 from utils.enums import EventType
+from utils.logger import logger
 
 
 class UGCEventService:

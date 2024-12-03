@@ -1,6 +1,6 @@
 from elasticsearch import AsyncElasticsearch, BadRequestError, NotFoundError
-from utils.abstract import AsyncSearchService
 from fastapi import Depends
+from utils.abstract import AsyncSearchService
 
 es: AsyncElasticsearch | None = None
 
@@ -16,11 +16,11 @@ class ElasticsearchAdapter(AsyncSearchService):
             return None
 
     async def search(
-                self,
-                index: str,
-                body: dict,
-                **kwargs
-            ):
+        self,
+        index: str,
+        body: dict,
+        **kwargs
+    ):
         try:
             return await self.elastic.search(
                 index=index, body=body,

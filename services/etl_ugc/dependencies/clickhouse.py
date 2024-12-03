@@ -1,8 +1,7 @@
 from aiochclient import ChClient
 from aiohttp import ClientSession
-
-from utils.abstract import AnalyticDatabaseService
 from db.clickhouse import ClickHouseAdapter
+from utils.abstract import AnalyticDatabaseService
 
 
 async def get_clickhouse_service(session: ClientSession, url: str) -> AnalyticDatabaseService:

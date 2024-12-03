@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Request, Depends
+from dependencies.user import get_user_service
+from fastapi import APIRouter, Depends, Request
 from schemas.review import ReviewLike
 from services.user import UserService
-from dependencies.user import get_user_service
 
 router = APIRouter()
 
@@ -28,7 +28,7 @@ async def like_review(
 
 @router.get("/{review_id}")
 async def get_review_likes(
-    request: Request, review_id: str, 
+    request: Request, review_id: str,
     user_service: UserService = Depends(get_user_service)
 ):
     await user_service.get_user_id_from_jwt(request)

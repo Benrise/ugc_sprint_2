@@ -1,10 +1,8 @@
-from motor.motor_asyncio import AsyncIOMotorClient
-from fastapi import Depends
-
-from utils.abstract import AsyncNoSQLDatabaseService
 from core.config import settings
 from db.mongodb import MongoDBAdapter
-
+from fastapi import Depends
+from motor.motor_asyncio import AsyncIOMotorClient
+from utils.abstract import AsyncNoSQLDatabaseService
 
 mongodb: AsyncIOMotorClient | None = None
 

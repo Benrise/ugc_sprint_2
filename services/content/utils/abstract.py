@@ -14,11 +14,11 @@ class AsyncCacheStorage(ABC):
 class AsyncSearchService(ABC):
     @abstractmethod
     async def get(
-                self,
-                index: str,
-                id: str,
-                **kwargs
-            ):
+        self,
+        index: str,
+        id: str,
+        **kwargs
+    ):
         pass
 
     @abstractmethod

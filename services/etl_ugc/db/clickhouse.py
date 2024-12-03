@@ -1,14 +1,9 @@
 from typing import Any, Optional
 
-from utils.logger import logger
-from utils.abstract import AnalyticDatabaseService
-from utils.sql_queries import (
-    MOVIE_PROGRESS_QUERY,
-    MOVIE_FILTERS_QUERY,
-    MOVIE_DETAILS_QUERY
-)
-
 from aiochclient import ChClient
+from utils.abstract import AnalyticDatabaseService
+from utils.logger import logger
+from utils.sql_queries import MOVIE_DETAILS_QUERY, MOVIE_FILTERS_QUERY, MOVIE_PROGRESS_QUERY
 
 
 class ClickHouseAdapter(AnalyticDatabaseService):

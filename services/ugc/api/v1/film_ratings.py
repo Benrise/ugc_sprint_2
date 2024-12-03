@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException, Request, Depends
+from dependencies.user import get_user_service
+from fastapi import APIRouter, Depends, HTTPException, Request
 from schemas.film import FilmRating
 from services.user import UserService
-from dependencies.user import get_user_service
 
 router = APIRouter()
 

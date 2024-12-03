@@ -1,13 +1,10 @@
-from typing import List
 from http import HTTPStatus
-
-from fastapi import APIRouter, Depends, HTTPException
+from typing import List
 
 import core.config as config
-
-from services.genre import GenreService, get_genre_service
+from fastapi import APIRouter, Depends, HTTPException
 from models.genre import Genre, GenreModel
-
+from services.genre import GenreService, get_genre_service
 
 router = APIRouter()
 

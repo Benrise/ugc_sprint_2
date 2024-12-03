@@ -1,21 +1,20 @@
 import uuid
-from fastapi import HTTPException, Request
 from http import HTTPStatus
 
 from async_fastapi_jwt_auth import AuthJWT
 from authlib.integrations.starlette_client import OAuth, OAuthError
+from core.config import OAuthYandexSettings
+from fastapi import HTTPException, Request
 from fastapi.responses import RedirectResponse
+from models.entity import OAuth2User, User
+from schemas.user import OAuthData
+from services.user import UserService
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from core.config import OAuthYandexSettings
-from models.entity import OAuth2User, User
-from schemas.user import OAuthData
 from utils.abstract import OAuthProvider
 from utils.generators import generate_unique_login
 from utils.logger import logger
-from services.user import UserService
 
 
 class YandexOAuthProvider(OAuthProvider):

@@ -1,14 +1,12 @@
+import json
 import os
 import sys
-import json
-
 from typing import List
-from elasticsearch import Elasticsearch
 
+from elasticsearch import Elasticsearch
+from process.elasticloader import ElasticLoader
 from utils.logger import logger
 from utils.wait_for_service import wait_for_service
-
-from process.elasticloader import ElasticLoader
 
 ELASTIC_PROTOCOL = os.getenv('ETL_ELASTIC_PROTOCOL', 'http')
 ELASTIC_HOST = os.getenv('ETL_ELASTIC_HOST', '127.0.0.1')

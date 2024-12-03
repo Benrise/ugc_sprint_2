@@ -1,12 +1,11 @@
 from functools import lru_cache
-from fastapi import Depends
-
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.postgres import get_session
-from services.user import UserService
-from services.oauth import OAuthService
 from dependencies.user import get_user_service
+from fastapi import Depends
+from services.oauth import OAuthService
+from services.user import UserService
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 @lru_cache()

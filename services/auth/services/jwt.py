@@ -1,16 +1,15 @@
 from uuid import UUID
+
+from async_fastapi_jwt_auth import AuthJWT
+from core.config import jwt_settings
+from db.postgres import get_session
+from dependencies.user import get_user_service
 from fastapi import Depends, Request
 from fastapi.security import HTTPBearer
 from redis.asyncio import Redis
-
-from async_fastapi_jwt_auth import AuthJWT
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from core.config import jwt_settings
-from dependencies.user import get_user_service
-from services.user import UserService
 from schemas.user import TokensResponse, UserInDBRole
-from db.postgres import get_session
+from services.user import UserService
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class JWTService:

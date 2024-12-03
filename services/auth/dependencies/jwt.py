@@ -1,11 +1,10 @@
 from functools import lru_cache
-from fastapi import Depends
 
 from db.redis import get_redis
+from fastapi import Depends
 from redis.asyncio import Redis
-from services.jwt import JWTService, JWTBearer
 from schemas.auth_request import AuthRequest
-
+from services.jwt import JWTBearer, JWTService
 from sqlalchemy.ext.asyncio import AsyncSession
 
 

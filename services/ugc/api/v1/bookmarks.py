@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Request, Depends
+from dependencies.user import get_user_service
+from fastapi import APIRouter, Depends, Request
 from schemas.bookmark import Bookmark
 from services.user import UserService
-from dependencies.user import get_user_service
+
 router = APIRouter()
 
 

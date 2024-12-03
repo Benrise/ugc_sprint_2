@@ -1,10 +1,9 @@
 from async_fastapi_jwt_auth import AuthJWT
-from fastapi import Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from db.postgres import get_session
-from services.user import UserService
 from dependencies.user import get_user_service
+from fastapi import Depends, HTTPException
+from services.user import UserService
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 async def superuser_required(

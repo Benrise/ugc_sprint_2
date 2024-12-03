@@ -1,14 +1,12 @@
-from typing import List
 from http import HTTPStatus
+from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-
-from services.person import PersonService, get_person_service
 import core.config as config
-from models.person import PersonFilms
-from models.film import FilmRating
+from fastapi import APIRouter, Depends, HTTPException, Query
 from models.abstract import PaginatedParams
-
+from models.film import FilmRating
+from models.person import PersonFilms
+from services.person import PersonService, get_person_service
 
 router = APIRouter()
 

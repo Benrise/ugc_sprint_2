@@ -1,7 +1,7 @@
 import logging
 import os
-from logging.handlers import RotatingFileHandler
 from datetime import datetime
+from logging.handlers import RotatingFileHandler
 
 logs_dir = "./logs"
 os.makedirs(logs_dir, exist_ok=True)

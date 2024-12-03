@@ -1,23 +1,18 @@
-import logging
-import uvicorn
 import datetime
-
+import logging
 from contextlib import asynccontextmanager
 
-from elasticsearch import AsyncElasticsearch
-from fastapi import FastAPI, Depends
-from fastapi.responses import ORJSONResponse
-from redis.asyncio import Redis
-
+import uvicorn
 from api.v1 import films, genres, persons
-
-from fastapi_limiter import FastAPILimiter
-from fastapi_limiter.depends import RateLimiter
-
 from core.config import settings
 from core.logger import LOGGING
-from db import elastic
-from db import redis
+from db import elastic, redis
+from elasticsearch import AsyncElasticsearch
+from fastapi import Depends, FastAPI
+from fastapi.responses import ORJSONResponse
+from fastapi_limiter import FastAPILimiter
+from fastapi_limiter.depends import RateLimiter
+from redis.asyncio import Redis
 
 
 @asynccontextmanager

@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, Request, Depends
+from dependencies.user import get_user_service
+from fastapi import APIRouter, Depends, HTTPException, Request
 from schemas.review import Review
 from services.user import UserService
-from dependencies.user import get_user_service
 
 router = APIRouter()
 

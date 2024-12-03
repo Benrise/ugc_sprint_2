@@ -1,12 +1,12 @@
 import json
-from utils.logger import logger
-
-from elasticsearch import Elasticsearch
 from typing import Any, Dict, Text
+
+from utils.logger import logger
 
 
 class ElasticLoader:
     """Class to load data to Elasticseach."""
+
     def __init__(self, client: object) -> None:
         self.client = client
 
@@ -17,7 +17,7 @@ class ElasticLoader:
             logger.info(
                 'Response received successfully. Elastichsearch is working.'
             )
-            
+
             exists_index = self.client.indices.exists(index=index)
 
             if not exists_index:

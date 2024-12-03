@@ -1,20 +1,11 @@
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 from aiokafka import AIOKafkaConsumer
-
-from db.clickhouse import ClickHouseAdapter
-from utils.logger import logger
 from core.settings import settings
-from utils.sql_queries import (
-    MOVIE_PROGRESS_QUERY,
-    MOVIE_FILTERS_QUERY,
-    MOVIE_DETAILS_QUERY
-)
-from schemas.events import (
-    MovieProgressEvent,
-    MovieFiltersEvent,
-    MovieDetailsEvent
-)
+from db.clickhouse import ClickHouseAdapter
+from schemas.events import MovieDetailsEvent, MovieFiltersEvent, MovieProgressEvent
+from utils.logger import logger
+from utils.sql_queries import MOVIE_DETAILS_QUERY, MOVIE_FILTERS_QUERY, MOVIE_PROGRESS_QUERY
 
 
 class ETLService:
@@ -44,7 +35,7 @@ class ETLService:
             logger.info("Kafka consumer started")
             while True:
                 messages = await self.consumer.getmany(
-                    timeout_ms=settings.kafka_consume_timeout_seconds*1000,
+                    timeout_ms=settings.kafka_consume_timeout_seconds * 1000,
                     max_records=settings.kafka_consume_max_records
                 )
                 for topic_partition, messages_list in messages.items():

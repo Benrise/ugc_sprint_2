@@ -1,22 +1,13 @@
 import json
-
 from typing import Optional
 
-from fastapi import (
-    APIRouter,
-    Request,
-    Depends,
-    HTTPException,
-    status,
-)
-
-from services.user import UserService
-from dependencies.user import get_user_service
-from utils.enums import EventType
-from utils.broker import get_topic_name, prepare_event_data
-from dependencies.kafka import get_kafka_service
 from brokers.kafka import KafkaAdapter
-
+from dependencies.kafka import get_kafka_service
+from dependencies.user import get_user_service
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from services.user import UserService
+from utils.broker import get_topic_name, prepare_event_data
+from utils.enums import EventType
 
 router = APIRouter()
 

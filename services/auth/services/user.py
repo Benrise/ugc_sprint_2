@@ -1,26 +1,18 @@
-from typing import List
 from http import HTTPStatus
+from typing import List
 from uuid import UUID
-from fastapi import HTTPException, Request
 
-from redis.asyncio import Redis
+from async_fastapi_jwt_auth import AuthJWT
+from core.config import jwt_settings
+from fastapi import HTTPException, Request
 from fastapi.encoders import jsonable_encoder
+from models.entity import User, UserHistory
+from redis.asyncio import Redis
+from schemas.user import ChangePassword, ChangeUsername, LoginHistory, UserCreate, UserInDB, UsernameLogin
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import select
-from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash
-from async_fastapi_jwt_auth import AuthJWT
-
-from core.config import jwt_settings
-from models.entity import User, UserHistory
-from schemas.user import (
-    ChangePassword,
-    ChangeUsername,
-    UserCreate,
-    UserInDB,
-    LoginHistory,
-    UsernameLogin
-)
 
 
 class UserService:
@@ -86,7 +78,7 @@ class UserService:
         users: List[UserInDB] = query.scalars().all()
         return users
 
-    async def complete_oauth2_authentication(self, user: User, _: Request, authorize: AuthJWT, db: AsyncSession) -> tuple[str, str, User]:        
+    async def complete_oauth2_authentication(self, user: User, _: Request, authorize: AuthJWT, db: AsyncSession) -> tuple[str, str, User]:
         access_token = await authorize.create_access_token(
             subject=str(user.id),
             expires_time=jwt_settings.access_expires,
