@@ -2,6 +2,7 @@ import logging
 import os
 from datetime import datetime
 from logging.handlers import RotatingFileHandler, SocketHandler
+
 from core.config import elk_settings
 
 logs_dir = "./logs"

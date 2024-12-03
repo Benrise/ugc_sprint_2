@@ -1,19 +1,19 @@
-from datetime import datetime
 import logging
 from contextlib import asynccontextmanager
+from datetime import datetime
 
 import uvicorn
 from api.v1 import roles, users
 from async_fastapi_jwt_auth.exceptions import AuthJWTException
 from core.config import settings
 from core.logger import LOGGING
-from utils.logger import logger
 from db import redis
 from dependencies.jwt import get_current_user_global
 from fastapi import Depends, FastAPI, Request, status
 from fastapi.responses import JSONResponse, ORJSONResponse
 from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
+from hawkcatcher import Hawk
 from opentelemetry import trace
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
@@ -22,8 +22,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
 from redis.asyncio import Redis
 from starlette.middleware.sessions import SessionMiddleware
-
-from hawkcatcher import Hawk
+from utils.logger import logger
 
 hawk = Hawk(settings.hawk_integration_token)
 

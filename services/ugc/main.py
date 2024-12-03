@@ -1,19 +1,18 @@
-from datetime import datetime
 import logging
 from contextlib import asynccontextmanager
+from datetime import datetime
 
 import uvicorn
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from api.v1 import bookmarks, film_ratings, producer, review_likes, reviews
 from core.config import settings
 from core.logger import LOGGING
-from utils.logger import logger
 from db.init_db import init_mongodb
 from dependencies import kafka
 from fastapi import FastAPI, Request, status
 from fastapi.responses import ORJSONResponse
-
 from hawkcatcher import Hawk
+from utils.logger import logger
 
 hawk = Hawk(settings.hawk_integration_token)
 

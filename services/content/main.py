@@ -1,21 +1,20 @@
-from datetime import datetime
 import logging
 from contextlib import asynccontextmanager
+from datetime import datetime
 
 import uvicorn
 from api.v1 import films, genres, persons
 from core.config import settings
 from core.logger import LOGGING
-from utils.logger import logger
 from db import elastic, redis
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends, FastAPI, Request, status
 from fastapi.responses import ORJSONResponse
 from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
-from redis.asyncio import Redis
-
 from hawkcatcher import Hawk
+from redis.asyncio import Redis
+from utils.logger import logger
 
 hawk = Hawk(settings.hawk_integration_token)
 
