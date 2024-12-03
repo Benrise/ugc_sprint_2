@@ -51,3 +51,6 @@ services/mongodb/data
 
 # logs data
 logs/
+
+# github actions artifacts
+flake8-report
