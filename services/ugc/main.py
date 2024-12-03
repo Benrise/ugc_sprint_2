@@ -12,9 +12,7 @@ from dependencies import kafka
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
-from hawkcatcher import Hawk
-
-hawk = Hawk(settings.hawk_integration_token)
+from hawkcatcher.modules.fastapi import HawkFastapi
 
 
 @asynccontextmanager
@@ -43,6 +41,11 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
     lifespan=lifespan
 )
+
+hawk = HawkFastapi({
+    "app_instance": app,
+    "token": settings.hawk_integration_token
+})
 
 
 @app.get("/health")

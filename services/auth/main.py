@@ -22,9 +22,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExport
 from redis.asyncio import Redis
 from starlette.middleware.sessions import SessionMiddleware
 
-from hawkcatcher import Hawk
-
-hawk = Hawk(settings.hawk_integration_token)
+from hawkcatcher.modules.fastapi import HawkFastapi
 
 
 @asynccontextmanager
@@ -45,6 +43,11 @@ app = FastAPI(
     lifespan=lifespan,
     dependencies=[Depends(RateLimiter(times=5, seconds=10))],
 )
+
+hawk = HawkFastapi({
+    "app_instance": app,
+    "token": settings.hawk_integration_token
+})
 
 
 @app.get("/health")
