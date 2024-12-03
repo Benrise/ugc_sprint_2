@@ -34,6 +34,7 @@ logging_config.dictConfig(LOGGING)
 
 class Settings(BaseSettings):
     project_name: str = Field(..., alias='AUTH_PROJECT_NAME')
+    service_host: str = Field('auth', alias='AUTH_SERVICE_HOST')
     service_port: int = Field(8001, alias='AUTH_SERVICE_PORT')
     redis_host: str = Field('redis', alias='AUTH_REDIS_HOST')
     redis_port: int = Field(6379, alias='AUTH_REDIS_PORT')

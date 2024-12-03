@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import logging
 from contextlib import asynccontextmanager
 
@@ -52,7 +52,7 @@ app = FastAPI(
 async def health_check():
     return {
         "status": "healthy",
-        "timestamp": datetime.datetime.now().isoformat(),
+        "timestamp": datetime.now().isoformat(),
     }
 
 app.add_middleware(SessionMiddleware, secret_key=settings.secret_key_session)
@@ -75,13 +75,23 @@ def configure_tracer() -> None:
 
 @app.middleware('http')
 async def before_request(request: Request, call_next):
+    start_time = datetime.now()
     response = await call_next(request)
     request_id = request.headers.get('X-Request-Id')
     if not request_id:
         return ORJSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={'detail': 'X-Request-Id is required'})
 
-    logger.info(f"Request: {request.method} {request.url}")
-    logger.info(f"Response: {response.status_code}")
+    logger.info(
+        "middleware",
+        extra={
+            "request_id": request_id,
+            "host": settings.service_host,
+            "method": request.method,
+            "query_params": str(request.query_params),
+            "status_code": response.status_code,
+            "elapsed_time": (datetime.now() - start_time).total_seconds(),
+        }
+    )
 
     return response
 

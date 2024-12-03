@@ -55,6 +55,19 @@ services:
         timeout: 5s
         retries: 3
 
+    elk-auth-filebeat:
+      container_name: elk-auth-filebeat
+      build:
+        context: ./services/auth/filebeat
+      env_file:
+        - .env
+      volumes:
+        - ./services/auth/logs:/var/app/log
+      depends_on:
+        - auth
+        - elk-elasticsearch
+        - elk-logstash
+
     auth_db:
       container_name: "auth_db"
       build: ./services/auth_db
