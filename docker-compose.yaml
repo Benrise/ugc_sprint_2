@@ -126,10 +126,6 @@ services:
         test: ["CMD-SHELL", "curl -s http://localhost:${ETL_ELASTIC_PORT}/_cat/health?h=status | grep -q green"]
         retries: 90
         interval: 3s
-      deploy:
-        resources:
-          limits:
-            memory: 4GB
 
     etl_content:
       container_name: "etl_content"
@@ -206,9 +202,7 @@ services:
         - .env
       depends_on:
         - mongodb
-        - kafka-0
-        - kafka-1
-        - kafka-2
+        - kafka
       healthcheck:
         test: ["CMD-SHELL", "curl -f http://localhost:${UGC_SERVICE_PORT}/health || exit 1"]
         interval: 10s
@@ -228,54 +222,13 @@ services:
         - elk-elasticsearch
         - elk-logstash
 
-    kafka-0:
+    kafka:
       build: ./services/kafka
-      container_name: kafka-0
-      environment:
-          KAFKA_CFG_NODE_ID: ${KAFKA_0_CFG_NODE_ID}
-          KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: ${KAFKA_0_CFG_CONTROLLER_QUORUM_VOTERS}
-          KAFKA_CFG_LISTENERS: ${KAFKA_0_CFG_LISTENERS}
-          KAFKA_CFG_ADVERTISED_LISTENERS: ${KAFKA_0_CFG_ADVERTISED_LISTENERS}
+      container_name: kafka
       env_file:
         - .env
       volumes:
-        - kafka-0_data:/bitnami/kafka
-      healthcheck:
-        test: kafka-cluster.sh cluster-id --bootstrap-server localhost:9092 || exit 1
-        interval: 1s
-        timeout: 60s
-        retries: 60
-
-    kafka-1:
-      build: ./services/kafka
-      container_name: kafka-1
-      environment:
-          KAFKA_CFG_NODE_ID: ${KAFKA_1_CFG_NODE_ID}
-          KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: ${KAFKA_1_CFG_CONTROLLER_QUORUM_VOTERS}
-          KAFKA_CFG_LISTENERS: ${KAFKA_1_CFG_LISTENERS}
-          KAFKA_CFG_ADVERTISED_LISTENERS: ${KAFKA_1_CFG_ADVERTISED_LISTENERS}
-      env_file:
-        - .env
-      volumes:
-        - kafka-1_data:/bitnami/kafka
-      healthcheck:
-        test: kafka-cluster.sh cluster-id --bootstrap-server localhost:9092 || exit 1
-        interval: 1s
-        timeout: 60s
-        retries: 60
-    
-    kafka-2:
-      build: ./services/kafka
-      container_name: kafka-2
-      environment:
-          KAFKA_CFG_NODE_ID: ${KAFKA_2_CFG_NODE_ID}
-          KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: ${KAFKA_2_CFG_CONTROLLER_QUORUM_VOTERS}
-          KAFKA_CFG_LISTENERS: ${KAFKA_2_CFG_LISTENERS}
-          KAFKA_CFG_ADVERTISED_LISTENERS: ${KAFKA_2_CFG_ADVERTISED_LISTENERS}
-      env_file:
-        - .env
-      volumes:
-        - kafka-2_data:/bitnami/kafka
+        - ./services/kafka/data:/bitnami/kafka
       healthcheck:
         test: kafka-cluster.sh cluster-id --bootstrap-server localhost:9092 || exit 1
         interval: 1s
@@ -301,13 +254,15 @@ services:
       depends_on:
         clickhouse:
           condition: service_healthy
-        kafka-0:
+        kafka:
           condition: service_healthy
       restart: always
 
     clickhouse:
       build: ./services/clickhouse
       container_name: clickhouse
+      ports:
+        - ${CLICKHOUSE_SERVICE_PORTS}
       env_file:
         - .env
       volumes:
@@ -371,12 +326,3 @@ services:
       volumes:
         - ./services/elk-logstash/logstash.conf:/config/logstash.conf:ro
       command: logstash -f /config/logstash.conf
-      deploy:
-        resources:
-          limits:
-            memory: 4GB
-
-volumes:
-  kafka-0_data:
-  kafka-1_data:
-  kafka-2_data:

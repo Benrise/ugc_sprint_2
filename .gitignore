@@ -57,3 +57,6 @@ flake8-report
 
 # elk elastic data
 services/elk-es/data
+
+# kafka data
+services/kafka/data
