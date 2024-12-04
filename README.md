@@ -24,7 +24,7 @@
 ![image](https://github.com/user-attachments/assets/99d12f81-e2c5-4340-a905-c299cbc14f0a)
 
 
-** Hawk (сырая альтернатива Sentry)
+**Hawk (сырая альтернатива Sentry)**
 
 *В будущем потребуется [обновить](https://github.com/codex-team/hawk.python/issues/28) под модуль FastAPI. Сейчас работает только ручной вызов.*
 
